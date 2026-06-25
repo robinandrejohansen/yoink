@@ -1,0 +1,8 @@
+# Vercel deploys ONLY the static landing page in site/ (see outputDirectory in vercel.json).
+# Exclude the Python tool so Vercel doesn't auto-detect it and run it as a serverless
+# function — the downloader is meant to run locally, not on Vercel.
+app.py
+requirements.txt
+__pycache__/
+.venv/
+.claude/

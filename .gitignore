@@ -11,3 +11,4 @@ __pycache__/
 
 # local downloads (if ever saved inside the repo)
 /downloads/
+.vercel
