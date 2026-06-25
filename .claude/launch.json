@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "yt-downloader",
+      "runtimeExecutable": "./.venv/bin/python",
+      "runtimeArgs": ["app.py"],
+      "port": 5001
+    },
+    {
+      "name": "landing",
+      "runtimeExecutable": "./.venv/bin/python",
+      "runtimeArgs": ["-m", "http.server", "5002", "--directory", "site"],
+      "port": 5002
+    }
+  ]
+}
