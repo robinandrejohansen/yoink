@@ -4,250 +4,253 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Yoink — the local YouTube downloader</title>
-<meta name="description" content="A tiny, open-source YouTube downloader you run on your own machine. One command to install. Search, preview, and download in full quality. Private, unblockable, yours.">
+<meta name="description" content="A tiny, open-source YouTube downloader you run on your own machine. One command to install. Search, preview, and download in full quality. No ads, no spam, no quality caps.">
 <meta property="og:title" content="Yoink — the local YouTube downloader">
-<meta property="og:description" content="One command to install. Search, preview, and download YouTube videos in full quality — 100% local and open source.">
+<meta property="og:description" content="One command to install. Search, preview, and download YouTube videos in full quality. 100% local and open source.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧲</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #09090b; --fg: #fafafa; --muted: #a1a1aa; --faint: #71717a;
-    --border: rgba(255,255,255,.08); --border-2: rgba(255,255,255,.14);
-    --card: rgba(255,255,255,.022); --accent: #6e8bff; --accent-2: #b288ff;
-    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+    --bg: #0b0b0a; --panel: #121211; --paper: #f3f1ea; --muted: #908d83; --faint: #5d5b54;
+    --line: rgba(243,241,234,.10); --line-2: rgba(243,241,234,.20);
+    --accent: #ccf24a; --accent-ink: #14160a;
+    --sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: "Space Mono", ui-monospace, Menlo, monospace;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-  body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: var(--bg); color: var(--fg); line-height: 1.6;
-    -webkit-font-smoothing: antialiased; overflow-x: hidden;
-    background-image: radial-gradient(48rem 30rem at 50% -8%, rgba(110,139,255,.14), transparent 70%);
-  }
+  body { font-family: var(--sans); background: var(--bg); color: var(--paper);
+         line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   a { color: inherit; text-decoration: none; }
-  .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-  .center { max-width: 760px; margin-inline: auto; text-align: center; }
+  .bound { width: 100%; max-width: 1600px; margin: 0 auto; padding-inline: clamp(20px, 5vw, 72px); }
+  .ac { color: var(--accent); }
 
-  /* entrance */
-  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-  .rise { opacity: 0; animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
-  .d1{animation-delay:.05s}.d2{animation-delay:.13s}.d3{animation-delay:.21s}
-  .d4{animation-delay:.29s}.d5{animation-delay:.37s}
-  @media (prefers-reduced-motion: reduce) { .rise { animation: none; opacity: 1; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  .rise { opacity: 0; animation: rise .75s cubic-bezier(.2,.7,.2,1) forwards; }
+  .d1{animation-delay:.04s}.d2{animation-delay:.12s}.d3{animation-delay:.2s}.d4{animation-delay:.28s}.d5{animation-delay:.36s}.d6{animation-delay:.44s}
+  @media (prefers-reduced-motion: reduce){ .rise{ animation: none; opacity: 1; } }
 
-  /* nav */
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
-  .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 17px; letter-spacing: -.02em; }
-  .brand .mark { font-size: 19px; }
-  .icon-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 9px;
-              border: 1px solid var(--border); color: var(--fg); font-size: 14px; font-weight: 500;
-              background: var(--card); transition: .15s; }
-  .icon-btn:hover { border-color: var(--border-2); background: rgba(255,255,255,.05); }
-  .icon-btn svg { width: 17px; height: 17px; fill: currentColor; }
+  /* top bar */
+  .bar { border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 9;
+         background: rgba(11,11,10,.72); backdrop-filter: blur(12px); }
+  .bar .bound { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 18px; letter-spacing: -.02em; }
+  .nav { display: flex; align-items: center; gap: 28px; }
+  .nav-link { font-size: 14px; color: var(--muted); transition: .15s; }
+  .nav-link:hover { color: var(--paper); }
+  .gh { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500;
+        border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 14px; transition: .15s; }
+  .gh:hover { background: rgba(243,241,234,.05); }
+  .gh svg, .brand svg { width: 17px; height: 17px; fill: currentColor; }
 
   /* hero */
-  header { padding: 70px 0 40px; }
-  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted);
-             border: 1px solid var(--border); background: var(--card); padding: 6px 14px; border-radius: 99px; }
-  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px #4ade80; }
-  h1 { font-size: clamp(38px, 6.2vw, 66px); line-height: 1.04; letter-spacing: -.035em; font-weight: 800; margin: 26px 0 0; }
-  h1 .grad { background: linear-gradient(110deg, var(--accent), var(--accent-2)); -webkit-background-clip: text;
-             background-clip: text; -webkit-text-fill-color: transparent; }
-  .lede { color: var(--muted); font-size: clamp(16px, 2vw, 19px); margin: 22px auto 0; max-width: 33em; }
+  .hero { display: grid; grid-template-columns: minmax(0,1.06fr) minmax(0,.94fr);
+          gap: clamp(32px, 5vw, 80px); align-items: center; padding: clamp(48px, 7vw, 104px) 0 clamp(40px, 5vw, 72px); }
+  .kicker { font-family: var(--mono); font-size: 13px; letter-spacing: .06em; text-transform: uppercase;
+            color: var(--muted); display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+  .kicker::before { content: ""; width: 34px; height: 2px; background: var(--accent); }
+  h1 { font-size: clamp(46px, 6.6vw, 96px); line-height: .98; letter-spacing: -.04em; font-weight: 600; }
+  .sub { color: var(--muted); font-size: clamp(16px, 1.35vw, 19px); margin-top: 28px; max-width: 32em; }
 
-  /* install command */
-  .install { margin: 34px auto 0; max-width: 600px; }
-  .tabs { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--border); border-radius: 10px;
-          background: var(--card); margin-bottom: 12px; }
-  .tab { font: 500 13px/1 "Inter", sans-serif; color: var(--muted); padding: 7px 14px; border-radius: 7px;
-         cursor: pointer; border: 0; background: transparent; transition: .15s; }
-  .tab.on { background: rgba(255,255,255,.08); color: var(--fg); }
-  .cmd { display: flex; align-items: center; gap: 12px; background: #0c0c0f; border: 1px solid var(--border);
-         border-radius: 13px; padding: 4px 4px 4px 18px; box-shadow: 0 20px 50px -24px rgba(0,0,0,.8); }
-  .cmd code { flex: 1; min-width: 0; font-family: var(--mono); font-size: 14px; color: #e7e7ea; text-align: left;
-              white-space: nowrap; overflow-x: auto; padding: 14px 0; scrollbar-width: none; }
+  .install { margin-top: 36px; max-width: 620px; }
+  .tabs { display: inline-flex; gap: 2px; border: 1px solid var(--line); border-radius: 9px; padding: 3px; margin-bottom: 12px; }
+  .tab { font: 700 12px var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted);
+         padding: 7px 16px; border: 0; background: transparent; border-radius: 6px; cursor: pointer; transition: .15s; }
+  .tab.on { background: var(--accent); color: var(--accent-ink); }
+  .cmd { display: flex; align-items: stretch; gap: 10px; background: #080807; border: 1px solid var(--line-2);
+         border-radius: 12px; padding-left: 18px; }
+  .cmd code { flex: 1; min-width: 0; font: 15px var(--mono); color: var(--paper); white-space: nowrap;
+              overflow-x: auto; padding: 16px 0; scrollbar-width: none; display: flex; gap: 9px; align-items: center; }
   .cmd code::-webkit-scrollbar { display: none; }
-  .cmd .prompt { color: var(--accent); user-select: none; }
-  .copy { flex: 0 0 auto; align-self: stretch; display: inline-flex; align-items: center; gap: 7px;
-          padding: 0 16px; border: 0; border-radius: 10px; background: var(--fg); color: #09090b;
-          font: 600 13px "Inter", sans-serif; cursor: pointer; transition: .15s; }
-  .copy:hover { opacity: .88; }
-  .copy svg { width: 15px; height: 15px; }
-  .run-note { color: var(--faint); font-size: 13.5px; margin-top: 12px; font-family: var(--mono); }
-  .run-note b { color: var(--muted); font-weight: 600; }
+  .cmd .pr { color: var(--accent); user-select: none; }
+  .copy { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; margin: 6px;
+          border: 0; border-radius: 8px; background: var(--paper); color: #0b0b0a; font: 700 13px var(--sans); cursor: pointer; transition: .15s; }
+  .copy:hover { opacity: .85; } .copy svg { width: 15px; height: 15px; }
+  .runnote { font: 14px var(--mono); color: var(--faint); margin-top: 14px; }
+  .runnote b { color: var(--accent); font-weight: 400; }
 
-  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
-  .btn { display: inline-flex; align-items: center; gap: 9px; padding: 12px 20px; border-radius: 11px;
-         font-size: 14.5px; font-weight: 600; cursor: pointer; transition: .15s; border: 1px solid transparent; }
-  .btn.primary { background: var(--fg); color: #09090b; }
-  .btn.primary:hover { transform: translateY(-1px); }
-  .btn.ghost { border-color: var(--border-2); color: var(--fg); background: var(--card); }
-  .btn.ghost:hover { background: rgba(255,255,255,.05); }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+  .btn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 22px; border-radius: 10px;
+         font-size: 15px; font-weight: 600; cursor: pointer; transition: .15s; border: 1px solid transparent; }
+  .btn.primary { background: var(--paper); color: #0b0b0a; }
+  .btn.primary:hover { transform: translateY(-2px); }
+  .btn.line { border-color: var(--line-2); color: var(--paper); }
+  .btn.line:hover { background: rgba(243,241,234,.05); }
   .btn svg { width: 17px; height: 17px; fill: currentColor; }
 
-  /* trust bar */
-  .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 24px; }
-  .trust span { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted);
-                border: 1px solid var(--border); background: var(--card); padding: 6px 13px; border-radius: 99px; }
-  .trust b { color: #4ade80; font-weight: 700; font-size: 12px; }
+  .trust { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 30px;
+           font: 13px var(--mono); color: var(--muted); }
+  .trust li { display: inline-flex; align-items: center; gap: 8px; }
+  .trust b { color: var(--accent); font-weight: 700; }
 
-  /* product window */
-  .shot { margin: 60px auto 0; max-width: 760px; }
-  .window { background: #18181b; border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
-            box-shadow: 0 40px 90px -30px rgba(0,0,0,.85); }
-  .titlebar { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
-  .lights { display: flex; gap: 7px; } .lights i { width: 11px; height: 11px; border-radius: 50%; background: #3f3f46; }
-  .addr { flex: 1; text-align: center; font-family: var(--mono); font-size: 12px; color: var(--faint);
-          background: #0c0c0f; border: 1px solid var(--border); border-radius: 7px; padding: 4px 0; max-width: 280px; margin-inline: auto; }
-  .app { padding: 18px; background: #0e0e11; }
-  .m-label { font-size: 10px; letter-spacing: .09em; color: var(--faint); text-transform: uppercase; margin: 2px 0 6px; }
-  .m-field { background: #18181b; border: 1px solid var(--border); border-radius: 9px; padding: 10px 13px;
-             font-size: 13px; color: var(--fg); display: flex; align-items: center; justify-content: space-between; }
-  .m-field.accent { border-color: rgba(110,139,255,.5); }
-  .m-field .s { color: var(--accent); font-weight: 600; }
-  .m-segs { display: flex; gap: 6px; margin: 12px 0 10px; }
-  .m-seg { font-size: 12px; padding: 5px 11px; border-radius: 7px; border: 1px solid var(--border); color: var(--muted); }
-  .m-seg.on { background: var(--accent); color: #09090b; border-color: var(--accent); font-weight: 600; }
-  .m-row { display: flex; gap: 10px; align-items: center; padding: 7px; background: #18181b;
-           border: 1px solid var(--border); border-radius: 9px; margin-top: 8px; }
-  .m-thumb { position: relative; width: 96px; height: 54px; border-radius: 5px; overflow: hidden; flex: 0 0 auto; background: #000; }
-  .m-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .m-dur { position: absolute; bottom: 3px; right: 3px; font-size: 10px; font-weight: 600; color: #fff;
-           background: rgba(0,0,0,.82); padding: 0 4px; border-radius: 3px; }
-  .m-dur.short { background: #e0143c; }
-  .m-meta { flex: 1; min-width: 0; text-align: left; }
-  .m-t { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .m-c { font-size: 11px; color: var(--muted); }
-  .m-dl { font-size: 11px; font-weight: 600; color: #09090b; background: var(--fg); padding: 6px 11px; border-radius: 7px; flex: 0 0 auto; }
+  /* product panel */
+  .panel { border: 1px solid var(--line-2); border-radius: 14px; overflow: hidden; background: var(--panel);
+           box-shadow: 0 50px 100px -40px rgba(0,0,0,.9); }
+  .pbar { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-bottom: 1px solid var(--line); }
+  .dots { display: flex; gap: 7px; } .dots i { width: 11px; height: 11px; border-radius: 50%; background: #34332e; }
+  .addr { flex: 1; text-align: center; font: 12px var(--mono); color: var(--faint);
+          background: #080807; border: 1px solid var(--line); border-radius: 7px; padding: 5px 0; max-width: 260px; margin-inline: auto; }
+  .app { padding: 20px; }
+  .lab { font: 700 10px var(--mono); letter-spacing: .12em; color: var(--faint); text-transform: uppercase; margin: 2px 0 7px; }
+  .fld { background: #080807; border: 1px solid var(--line); border-radius: 9px; padding: 11px 14px;
+         font-size: 13px; display: flex; align-items: center; justify-content: space-between; }
+  .fld.on { border-color: rgba(204,242,74,.45); }
+  .fld .s { color: var(--accent); font-weight: 600; }
+  .segs { display: flex; gap: 7px; margin: 13px 0 11px; }
+  .seg { font: 12px var(--mono); padding: 5px 12px; border-radius: 7px; border: 1px solid var(--line); color: var(--muted); }
+  .seg.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .row { display: flex; gap: 11px; align-items: center; padding: 8px; background: #080807;
+         border: 1px solid var(--line); border-radius: 9px; margin-top: 9px; }
+  .th { position: relative; width: 104px; height: 58px; border-radius: 5px; overflow: hidden; flex: 0 0 auto; background: #000; }
+  .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .dur { position: absolute; bottom: 3px; right: 3px; font: 10px var(--mono); color: #fff; background: rgba(0,0,0,.85); padding: 1px 4px; border-radius: 3px; }
+  .dur.short { background: #e0143c; }
+  .mt { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mc { font-size: 11px; color: var(--muted); }
+  .dl { font: 600 11px var(--sans); color: var(--accent-ink); background: var(--accent); padding: 7px 12px; border-radius: 7px; flex: 0 0 auto; }
+  .info { flex: 1; min-width: 0; }
 
-  /* features */
-  section { padding: 80px 0 0; }
-  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border);
-              border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-  .feature { background: var(--bg); padding: 26px; }
-  .feature .fi { font-size: 20px; margin-bottom: 12px; display: block; }
-  .feature h3 { font-size: 15px; font-weight: 600; letter-spacing: -.01em; margin-bottom: 5px; }
-  .feature p { color: var(--muted); font-size: 13.5px; line-height: 1.55; }
+  /* sections */
+  .block { padding: clamp(64px, 8vw, 130px) 0 0; }
+  .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: clamp(28px, 4vw, 52px); }
+  .sec-no { font: 700 13px var(--mono); color: var(--accent); }
+  .sec-head h2 { font-size: clamp(30px, 4vw, 52px); font-weight: 500; letter-spacing: -.03em; line-height: 1; }
 
-  /* footer */
-  footer { margin-top: 90px; border-top: 1px solid var(--border); padding: 30px 0 50px; }
-  .foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-  .foot .links { display: flex; gap: 18px; font-size: 13.5px; color: var(--muted); align-items: center; }
-  .foot .links a:hover { color: var(--fg); }
-  .foot .links svg { width: 16px; height: 16px; fill: currentColor; vertical-align: -3px; }
-  .disclaimer { color: var(--faint); font-size: 12px; margin-top: 18px; max-width: 62em; line-height: 1.6; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line);
+          border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .feat { background: var(--bg); padding: clamp(26px, 2.4vw, 42px); }
+  .feat .no { font: 700 12px var(--mono); color: var(--accent); letter-spacing: .08em; }
+  .feat h3 { font-size: 20px; font-weight: 500; letter-spacing: -.015em; margin: 22px 0 9px; }
+  .feat p { color: var(--muted); font-size: 14.5px; line-height: 1.55; }
 
-  @media (max-width: 720px) {
-    header { padding: 48px 0 24px; }
-    section { padding: 56px 0 0; }
-    .features { grid-template-columns: 1fr; }
-    .nav-features { display: none; }
-    .cmd code { font-size: 12.5px; }
-    .copy span { display: none; } .copy { padding: 0 13px; }
-    footer { margin-top: 64px; }
-    .foot { flex-direction: column; align-items: flex-start; }
+  .why p { font-size: clamp(24px, 3.4vw, 46px); font-weight: 400; letter-spacing: -.025em; line-height: 1.28; max-width: 22ch; }
+  .why .small { font: 14px var(--mono); color: var(--muted); margin-top: 28px; max-width: 60ch; line-height: 1.7; letter-spacing: 0; }
+
+  footer { border-top: 1px solid var(--line); margin-top: clamp(64px, 8vw, 120px); padding: 32px 0 56px; }
+  footer .bound { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; }
+  .flinks { display: flex; align-items: center; gap: 22px; font: 13px var(--mono); color: var(--muted); }
+  .flinks a:hover { color: var(--paper); } .flinks svg { width: 15px; height: 15px; fill: currentColor; vertical-align: -2px; }
+  .disc { font: 12px var(--mono); color: var(--faint); margin-top: 18px; max-width: 80ch; line-height: 1.7; }
+
+  @media (max-width: 860px) {
+    .bar .bound { height: 56px; } .nav { gap: 14px; } .nav-link { display: none; }
+    .hero { grid-template-columns: 1fr; gap: 40px; padding: 40px 0 24px; }
+    .cmd code { font-size: 13px; } .copy span { display: none; } .copy { padding: 0 14px; }
+    .grid { grid-template-columns: 1fr; }
+    footer .bound { flex-direction: column; align-items: flex-start; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <nav>
-    <div class="brand"><span class="mark">🧲</span> Yoink</div>
-    <a class="icon-btn" href="https://github.com/robinandrejohansen/yoink" target="_blank" rel="noopener">
-      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-      GitHub
-    </a>
-  </nav>
-
-  <header class="center">
-    <span class="eyebrow rise d1"><span class="dot"></span> Open source · MIT · runs on your machine</span>
-    <h1 class="rise d1">Download YouTube videos.<br><span class="grad">Locally.</span></h1>
-    <p class="lede rise d2">Search, preview, and grab any video in full quality — H.264 that plays anywhere, up to 4K. One command to install. Nothing ever leaves your machine.</p>
-
-    <div class="install rise d3">
-      <div class="tabs">
-        <button class="tab on" data-t="pipx">pipx</button>
-        <button class="tab" data-t="uv">uv</button>
-      </div>
-      <div class="cmd">
-        <code id="cmd"><span class="prompt">$ </span><span id="cmdtext">pipx install git+https://github.com/robinandrejohansen/yoink</span></code>
-        <button class="copy" id="copy">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <span>Copy</span>
-        </button>
-      </div>
-      <p class="run-note" id="runnote">then start it anytime with <b>yoink</b></p>
+  <div class="bar">
+    <div class="bound">
+      <div class="brand"><span>🧲</span> yoink</div>
+      <nav class="nav">
+        <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="#why">Why local</a>
+        <a class="gh" href="https://github.com/robinandrejohansen/yoink" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub</a>
+      </nav>
     </div>
+  </div>
 
-    <div class="cta-row rise d4">
-      <a class="btn primary" href="https://github.com/robinandrejohansen/yoink" target="_blank" rel="noopener">
-        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-        Star on GitHub
-      </a>
-      <a class="btn ghost" href="#features">See what it does</a>
-    </div>
+  <main class="bound">
+    <section class="hero">
+      <div class="hero-l">
+        <div class="kicker rise d1">Local YouTube downloader</div>
+        <h1 class="rise d1">Download<br>YouTube videos,<br><span class="ac">locally.</span></h1>
+        <p class="sub rise d2">Search, preview, and grab any video in full quality. H.264 that plays everywhere, up to 4K. One command to install, and nothing ever leaves your machine.</p>
 
-    <div class="trust rise d4">
-      <span><b>✓</b> No ads</span>
-      <span><b>✓</b> No spam or malware</span>
-      <span><b>✓</b> Full quality, no caps</span>
-      <span><b>✓</b> Fast — no throttling</span>
-    </div>
-
-    <!-- product window -->
-    <div class="shot rise d5">
-      <div class="window">
-        <div class="titlebar">
-          <div class="lights"><i></i><i></i><i></i></div>
-          <div class="addr">127.0.0.1:5001</div>
+        <div class="install rise d3">
+          <div class="tabs">
+            <button class="tab on" data-t="pipx">pipx</button>
+            <button class="tab" data-t="uv">uv</button>
+          </div>
+          <div class="cmd">
+            <code><span class="pr">$</span><span id="cmdtext">pipx install git+https://github.com/robinandrejohansen/yoink</span></code>
+            <button class="copy" id="copy">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <p class="runnote" id="runnote">then run <b>yoink</b></p>
         </div>
-        <div class="app">
-          <div class="m-label">Quality</div>
-          <div class="m-field accent">Best compatible — H.264, plays everywhere <span style="color:var(--faint)">▾</span></div>
-          <div class="m-label" style="margin-top:12px">Search YouTube</div>
-          <div class="m-field">lofi beats <span class="s">Search</span></div>
-          <div class="m-segs">
-            <span class="m-seg on">All (12)</span><span class="m-seg">Videos (9)</span><span class="m-seg">Shorts (3)</span>
+
+        <div class="cta rise d4">
+          <a class="btn primary" href="https://github.com/robinandrejohansen/yoink" target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            Star on GitHub</a>
+          <a class="btn line" href="#features">See what it does</a>
+        </div>
+
+        <ul class="trust rise d5">
+          <li><b>✓</b> no ads</li>
+          <li><b>✓</b> no spam or malware</li>
+          <li><b>✓</b> full quality, no caps</li>
+          <li><b>✓</b> fast, no throttling</li>
+        </ul>
+      </div>
+
+      <div class="hero-r rise d4">
+        <div class="panel">
+          <div class="pbar">
+            <div class="dots"><i></i><i></i><i></i></div>
+            <div class="addr">127.0.0.1:5001</div>
           </div>
-          <div class="m-row">
-            <div class="m-thumb"><img src="https://i.ytimg.com/vi/jfKfPfyJRdk/mqdefault.jpg" alt=""><span class="m-dur">LIVE</span></div>
-            <div class="m-meta"><div class="m-t">lofi hip hop radio 📚 beats to relax</div><div class="m-c">Lofi Girl</div></div>
-            <span class="m-dl">Download</span>
-          </div>
-          <div class="m-row">
-            <div class="m-thumb"><img src="https://i.ytimg.com/vi/aqz-KE-bpKQ/mqdefault.jpg" alt=""><span class="m-dur">9:56</span></div>
-            <div class="m-meta"><div class="m-t">Big Buck Bunny (full short film)</div><div class="m-c">Blender Foundation</div></div>
-            <span class="m-dl">Download</span>
-          </div>
-          <div class="m-row">
-            <div class="m-thumb"><img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg" alt=""><span class="m-dur short">0:18</span></div>
-            <div class="m-meta"><div class="m-t">Quick tip in 18 seconds 🔥</div><div class="m-c">Indie Dev</div></div>
-            <span class="m-dl">Download</span>
+          <div class="app">
+            <div class="lab">Quality</div>
+            <div class="fld on">Best compatible (H.264) <span style="color:var(--faint)">▾</span></div>
+            <div class="lab" style="margin-top:13px">Search</div>
+            <div class="fld">lofi beats <span class="s">Search</span></div>
+            <div class="segs"><span class="seg on">All 12</span><span class="seg">Videos 9</span><span class="seg">Shorts 3</span></div>
+            <div class="row">
+              <div class="th"><img src="https://i.ytimg.com/vi/jfKfPfyJRdk/mqdefault.jpg" alt=""><span class="dur">LIVE</span></div>
+              <div class="info"><div class="mt">lofi hip hop radio 📚 beats to relax</div><div class="mc">Lofi Girl</div></div>
+              <span class="dl">Download</span>
+            </div>
+            <div class="row">
+              <div class="th"><img src="https://i.ytimg.com/vi/aqz-KE-bpKQ/mqdefault.jpg" alt=""><span class="dur">9:56</span></div>
+              <div class="info"><div class="mt">Big Buck Bunny (full short film)</div><div class="mc">Blender Foundation</div></div>
+              <span class="dl">Download</span>
+            </div>
+            <div class="row">
+              <div class="th"><img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg" alt=""><span class="dur short">0:18</span></div>
+              <div class="info"><div class="mt">Quick tip in 18 seconds 🔥</div><div class="mc">Indie Dev</div></div>
+              <span class="dl">Download</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </header>
+    </section>
 
-  <section id="features">
-    <div class="features">
-      <div class="feature"><span class="fi">🎞️</span><h3>Full quality &amp; fps</h3><p>Up to 4K, 60fps preserved. H.264 by default so it plays everywhere — AV1 for the purists.</p></div>
-      <div class="feature"><span class="fi">🔎</span><h3>Search + Shorts filter</h3><p>Find videos in-app and sort Shorts from long-form in a single click.</p></div>
-      <div class="feature"><span class="fi">👁️</span><h3>Hover to preview</h3><p>Muted autoplay on hover, so you grab the right video before downloading.</p></div>
-      <div class="feature"><span class="fi">📦</span><h3>Zero setup</h3><p>ffmpeg ships bundled. One command installs it; <code>yoink</code> launches it.</p></div>
-      <div class="feature"><span class="fi">🔒</span><h3>100% local &amp; private</h3><p>Runs on your machine. No servers, no logs, no tracking — nothing leaves.</p></div>
-      <div class="feature"><span class="fi">🧡</span><h3>Free &amp; open source</h3><p>MIT licensed. Fork it, ship it, make it yours. Built to give away.</p></div>
-    </div>
-  </section>
+    <section id="features" class="block">
+      <div class="sec-head"><span class="sec-no">01</span><h2>Everything online downloaders aren't</h2></div>
+      <div class="grid">
+        <div class="feat"><span class="no">01</span><h3>Full quality &amp; fps</h3><p>Up to 4K with 60fps preserved. H.264 by default so it plays everywhere, with AV1 when you want the absolute best.</p></div>
+        <div class="feat"><span class="no">02</span><h3>Search &amp; Shorts filter</h3><p>Find videos right in the app, and split Shorts from full videos with one tap.</p></div>
+        <div class="feat"><span class="no">03</span><h3>Hover to preview</h3><p>Muted autoplay on hover, so you grab the right video the first time.</p></div>
+        <div class="feat"><span class="no">04</span><h3>Zero setup</h3><p>ffmpeg ships bundled. One command installs it, then <span class="ac">yoink</span> launches it.</p></div>
+        <div class="feat"><span class="no">05</span><h3>Local &amp; private</h3><p>Runs on your machine. No servers, no logs, no tracking. Nothing leaves.</p></div>
+        <div class="feat"><span class="no">06</span><h3>Free &amp; open source</h3><p>MIT licensed. Fork it, ship it, make it yours. Built to give away.</p></div>
+      </div>
+    </section>
+
+    <section id="why" class="block why">
+      <div class="sec-head"><span class="sec-no">02</span><h2>Why local</h2></div>
+      <p>Every online downloader is a trap of ads, fake buttons, malware, and 480p caps. Yoink runs on your machine, so it just works, stays private, and is <span class="ac">yours</span>.</p>
+      <p class="small">Cloud servers also get blocked by YouTube within minutes, which is why hosted downloaders break constantly. Local means it keeps working.</p>
+    </section>
+  </main>
 
   <footer>
-    <div class="foot">
-      <div class="brand"><span class="mark">🧲</span> Yoink</div>
-      <div class="links">
+    <div class="bound">
+      <div class="brand"><span>🧲</span> yoink</div>
+      <div class="flinks">
         <a href="https://github.com/robinandrejohansen/yoink" target="_blank" rel="noopener">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
           GitHub</a>
@@ -255,36 +258,28 @@
         <span>MIT © <span id="year">2026</span></span>
       </div>
     </div>
-    <p class="disclaimer">Yoink is a personal, open-source tool, not affiliated with or endorsed by YouTube or Google. Download only content you have the right to, and respect creators' copyright and YouTube's Terms of Service.</p>
+    <div class="bound"><p class="disc">Yoink is a personal, open-source tool, not affiliated with or endorsed by YouTube or Google. Download only content you have the right to, and respect creators' copyright and YouTube's Terms of Service.</p></div>
   </footer>
-
-</div>
 
 <script>
   const $ = s => document.querySelector(s);
   $('#year').textContent = new Date().getFullYear();
-
   const CMDS = {
-    pipx: { cmd: "pipx install git+https://github.com/robinandrejohansen/yoink", note: 'then start it anytime with <b>yoink</b>' },
-    uv:   { cmd: "uvx --from git+https://github.com/robinandrejohansen/yoink yoink", note: 'runs instantly — no install needed' },
+    pipx: { cmd: "pipx install git+https://github.com/robinandrejohansen/yoink", note: 'then run <b>yoink</b>' },
+    uv:   { cmd: "uvx --from git+https://github.com/robinandrejohansen/yoink yoink", note: 'runs instantly, no install' },
   };
   let current = "pipx";
-
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
-    t.classList.add('on');
-    current = t.dataset.t;
+    t.classList.add('on'); current = t.dataset.t;
     $('#cmdtext').textContent = CMDS[current].cmd;
     $('#runnote').innerHTML = CMDS[current].note;
   }));
-
   $('#copy').addEventListener('click', () => {
     navigator.clipboard.writeText(CMDS[current].cmd).then(() => {
-      const c = $('#copy'); const label = c.querySelector('span');
-      const prev = label ? label.textContent : '';
-      if (label) label.textContent = 'Copied';
-      c.style.background = '#4ade80';
-      setTimeout(() => { if (label) label.textContent = prev || 'Copy'; c.style.background = ''; }, 1500);
+      const c = $('#copy'), l = c.querySelector('span'); const p = l ? l.textContent : '';
+      if (l) l.textContent = 'Copied'; c.style.background = 'var(--accent)';
+      setTimeout(() => { if (l) l.textContent = p || 'Copy'; c.style.background = ''; }, 1500);
     });
   });
 </script>
