@@ -6,6 +6,40 @@
 
 ---
 
+## Install
+
+**One command** — installs from this repo with **ffmpeg bundled**, so there's nothing else to set up:
+
+```bash
+pipx install git+https://github.com/robinandrejohansen/yoink
+```
+
+Then run it anytime:
+
+```bash
+yoink
+```
+
+That launches the app and opens it in your browser. Downloads save to `~/Downloads/yt` (override with `YT_DOWNLOAD_DIR`).
+
+<details>
+<summary>No <code>pipx</code>? Prefer <code>uv</code>, or want to run from source</summary>
+
+```bash
+# install pipx (once)
+brew install pipx                                   # macOS
+# or: python3 -m pip install --user pipx && python3 -m pipx ensurepath
+
+# — or — run instantly with uv, no install:
+uvx --from git+https://github.com/robinandrejohansen/yoink yoink
+
+# — or — from source:
+git clone https://github.com/robinandrejohansen/yoink && cd yoink
+python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
+./.venv/bin/python app.py
+```
+</details>
+
 ## Why local, not a website?
 
 A hosted YouTube downloader gets IP-blocked by YouTube within minutes and is a legal piñata — that's why every "online downloader" is broken or buried in ads. Running on your own machine means it **actually works**, it's **private**, and it's **yours**.
@@ -16,34 +50,16 @@ A hosted YouTube downloader gets IP-blocked by YouTube within minutes and is a l
 - 🔎 **Search + Shorts filter** — find videos in-app and sort Shorts from long-form in one click.
 - 👁️ **Hover to preview** — muted autoplay preview on hover, so you grab the right video.
 - ⚡ **Live progress** — real-time download + merge progress bar.
+- 📦 **Zero setup** — ffmpeg ships bundled; one command and you're running.
 - 🔒 **100% local & private** — runs on your machine; nothing leaves it.
 
-## Setup (once)
+## Update
 
 ```bash
-git clone https://github.com/robinandrejohansen/yoink
-cd yoink
-python3 -m venv .venv
-./.venv/bin/pip install -r requirements.txt
+pipx upgrade yoink-dl     # also pulls the latest yt-dlp
 ```
 
-Requires `ffmpeg` (`brew install ffmpeg` on macOS).
-
-## Run
-
-```bash
-./.venv/bin/python app.py
-```
-
-Open <http://127.0.0.1:5001>. Files save to `~/Downloads/yt` (override with `YT_DOWNLOAD_DIR`).
-
-## Maintenance
-
-If YouTube changes break downloads, update yt-dlp:
-
-```bash
-./.venv/bin/pip install -U yt-dlp
-```
+(From source: `./.venv/bin/pip install -U yt-dlp`.)
 
 ## Notes
 

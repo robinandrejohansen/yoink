@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yoink-dl"
+version = "0.1.0"
+description = "A tiny, local, open-source YouTube downloader — search, hover-preview, full-quality downloads."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Robin Johansen" }]
+keywords = ["youtube", "downloader", "yt-dlp", "video", "shorts"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Environment :: Web Environment",
+    "Topic :: Multimedia :: Video",
+]
+dependencies = [
+    "flask>=3.0",
+    "yt-dlp",
+    "certifi",
+    "imageio-ffmpeg",
+]
+
+[project.urls]
+Homepage = "https://github.com/robinandrejohansen/yoink"
+"Landing page" = "https://yt-ashen-phi.vercel.app"
+
+[project.scripts]
+yoink = "app:main"
+
+[tool.setuptools]
+py-modules = ["app"]

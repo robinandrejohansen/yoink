@@ -35,7 +35,23 @@ import yt_dlp
 
 DOWNLOAD_DIR = os.path.expanduser(os.environ.get("YT_DOWNLOAD_DIR", "~/Downloads/yt"))
 PORT = int(os.environ.get("YT_PORT", "5001"))
-FFMPEG = shutil.which("ffmpeg")
+
+
+def _resolve_ffmpeg():
+    """System ffmpeg if available, else the binary bundled with imageio-ffmpeg —
+    so a `pipx install` works with no manual ffmpeg setup."""
+    found = shutil.which("ffmpeg")
+    if found:
+        return found
+    try:
+        import imageio_ffmpeg
+
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return None
+
+
+FFMPEG = _resolve_ffmpeg()
 
 # Prefer H.264 (avc1) video + AAC (mp4a) audio so the merged .mp4 plays natively in
 # QuickTime / Apple players. YouTube only offers H.264 up to 1080p; 1440p/4K are VP9/AV1
@@ -475,7 +491,46 @@ function fail(msg) {
 </html>
 """
 
-if __name__ == "__main__":
+def _pick_port(preferred):
+    """Return the preferred port if free, otherwise an OS-assigned free one."""
+    import socket
+
+    for candidate in (preferred, 0):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind(("127.0.0.1", candidate))
+                return s.getsockname()[1]
+            except OSError:
+                continue
+    return preferred
+
+
+def _open_browser(url):
+    try:
+        import webbrowser
+
+        webbrowser.open(url)
+    except Exception:
+        pass
+
+
+def main():
+    """Console entry point (the `yoink` command): launch the app, open a browser."""
+    global PORT
+    PORT = _pick_port(PORT)
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
-    print(f"→ http://127.0.0.1:{PORT}   (saving to {DOWNLOAD_DIR})")
-    app.run(port=PORT, threaded=True, debug=False)
+    url = f"http://127.0.0.1:{PORT}"
+    if not FFMPEG:
+        print("⚠ ffmpeg not found and the bundled copy is unavailable — merging may fail.")
+    print(f"\n  🧲 Yoink is running at {url}")
+    print(f"     Saving downloads to {DOWNLOAD_DIR}")
+    print("     Press Ctrl+C to stop.\n")
+    threading.Timer(1.2, lambda: _open_browser(url)).start()
+    try:
+        app.run(port=PORT, threaded=True, debug=False)
+    except KeyboardInterrupt:
+        print("\n  Stopped. 👋")
+
+
+if __name__ == "__main__":
+    main()
