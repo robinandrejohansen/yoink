@@ -88,6 +88,12 @@
   .btn.ghost:hover { background: rgba(255,255,255,.05); }
   .btn svg { width: 17px; height: 17px; fill: currentColor; }
 
+  /* trust bar */
+  .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 24px; }
+  .trust span { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted);
+                border: 1px solid var(--border); background: var(--card); padding: 6px 13px; border-radius: 99px; }
+  .trust b { color: #4ade80; font-weight: 700; font-size: 12px; }
+
   /* product window */
   .shot { margin: 60px auto 0; max-width: 760px; }
   .window { background: #18181b; border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
@@ -183,6 +189,13 @@
         Star on GitHub
       </a>
       <a class="btn ghost" href="#features">See what it does</a>
+    </div>
+
+    <div class="trust rise d4">
+      <span><b>✓</b> No ads</span>
+      <span><b>✓</b> No spam or malware</span>
+      <span><b>✓</b> Full quality, no caps</span>
+      <span><b>✓</b> Fast — no throttling</span>
     </div>
 
     <!-- product window -->
